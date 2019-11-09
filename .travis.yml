@@ -12,7 +12,7 @@ script:
 after_success:
 # Build Prod Containers
   - docker build -t mgaygisiz/multi-container-application-client ./client
-  - docker build -t mgaygisiz/multi-container-application-nginx ./ngingx
+  - docker build -t mgaygisiz/multi-container-application-nginx ./nginx
   - docker build -t mgaygisiz/multi-container-application-server ./server
   - docker build -t mgaygisiz/multi-container-application-worker ./worker
 # Log in to the docker CLI
