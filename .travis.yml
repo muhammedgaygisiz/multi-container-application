@@ -1,0 +1,24 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t mgaygisiz/multi-container-application-test -f ./client/Dockerfile.dev ./client
+# For any other tests add according before-install here
+
+script:
+  - docker run -e CI=true mgaygisiz/multi-container-application-test npm run test
+
+after_success:
+# Build Prod Containers
+  - docker build -t mgaygisiz/multi-container-application-client ./client
+  - docker build -t mgaygisiz/multi-container-application-nginx ./ngingx
+  - docker build -t mgaygisiz/multi-container-application-server ./server
+  - docker build -t mgaygisiz/multi-container-application-worker ./worker
+# Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+# Push built images to Docker Hub
+  - docker push mgaygisiz/multi-container-application-client
+  - docker push mgaygisiz/multi-container-application-nginx
+  - docker push mgaygisiz/multi-container-application-server
+  - docker push mgaygisiz/multi-container-application-worker
