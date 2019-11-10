@@ -22,3 +22,15 @@ after_success:
   - docker push mgaygisiz/multi-container-application-nginx
   - docker push mgaygisiz/multi-container-application-server
   - docker push mgaygisiz/multi-container-application-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-2
+  app: multi-container-application
+  env: MultiContainerApplication-env
+  bucket_name: elasticbeanstalk-us-east-2-178022083866
+  bucket_path: multi-container-application
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
