@@ -1,7 +1,15 @@
+# Won't work still file is called gc.travis.yml not .travis.yml
 sudo: required
 services:
   - docker
+env:
+  global:
+    # Store current git sha as env var for building unique images
+    - SHA=$(get rev-parse HEAD)
+    # Google Cloud CLI does not show any prompts
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
+  #- openssl ...
   # Download and Install Google Cloud SDK
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   # Execution of file for further config
@@ -16,3 +24,23 @@ before_install:
   # Important!: Add the prompted command after installing the key on travis
   # at the beginning of the before_install command and add
   # service-account.json.enc to the github repository
+  # ---------------------------
+  # Select project to work in by project id
+  - gcloud config set project <project-id>
+  # Select data-zone (location in Kubernetes clusters view)
+  - gcloud config set comput/zone us-central1-a
+  # Select cluster (name in Kubernetes clusters view)
+  - gcloud container clusters get-credentials multi-cluster
+  # Login to Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  # Build docker image
+  - docker build -t mgaygisiz/reat-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true USERNAME/docker-react npm run test
+
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master
